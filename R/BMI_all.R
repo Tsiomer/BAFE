@@ -14,8 +14,12 @@ BMI_all <- function(){
     if( sum(names(raw.abun) == c("site_code", "species_name", "inds","sampling_area", "inds_density", "Species_Code")) != 6 ){
         stop("need to check species investigate data")
     }
+    if((T %in% is.na(raw.abun$inds))==TRUE){
+        raw.abun.1 <- raw.abun[-which(is.na(raw.abun$inds)),]
+    }else{
+        raw.abun.1 <- raw.abun
+    }
     
-    raw.abun.1 <- raw.abun[-which(is.na(raw.abun$inds)),]
     
     species_list <- data.frame(readxl::read_excel(filepath.1, sheet = 3))[,-c(4:7)]
     if( sum(names(species_list) == c("species_name", "Species_Code", "scientific_name","saprobic_value", "indicator_weight_value", "endangered_species_1","endangered_species_2","Korea_endemic")) != 8 ){
@@ -124,18 +128,21 @@ BMI_all <- function(){
     tool.matrix <- data.frame(matrix(nrow = dim(env.data.lalo), ncol = 4))
     colnames(tool.matrix) <- c("Surber net(30*30)","Surber net(50*50)","Dredge","Ekman")
     for(i in 1:length(env.data.lalo$investigate_tools)){
-        if(env.data.lalo$investigate_tools[i] == "Dredge"){
-            tool.matrix[i,3] <- env.data.lalo$tool_number[i]
-        }else if(env.data.lalo$investigate_tools[i] == "Surbernet"){
-            if(env.data.lalo$tool_width == 30){
-                tool.matrix[i,1] <- env.data.lalo$tool_number[i]
-            }else if(env.data.lalo$tool_width == 50){
-                tool.matrix[i,2] <- env.data.lalo$tool_number[i]
+        if(is.na(env.data.lalo$investigate_tools[i]) == F){
+            if(env.data.lalo$investigate_tools[i] == "Dredge"){
+                tool.matrix[i,3] <- env.data.lalo$tool_number[i]
+            }else if(env.data.lalo$investigate_tools[i] == "Surbernet"){
+                if(env.data.lalo$tool_width[i] == 30){
+                    tool.matrix[i,1] <- env.data.lalo$tool_number[i]
+                }else if(env.data.lalo$tool_width[i] == 50){
+                    tool.matrix[i,2] <- env.data.lalo$tool_number[i]
+                }
+            }else{
+                tool.matrix[i,4] <- env.data.lalo$tool_number[i]
             }
         }else{
-            tool.matrix[i,4] <- env.data.lalo$tool_number[i]
+            next
         }
-        
     }
     
     
@@ -172,7 +179,8 @@ BMI_all <- function(){
         }
         
     }
-    aa.1 <- gsub(",0","", aa)
+    aa.0 <- gsub(",0","", aa)
+    aa.1 <- gsub("0,","", aa.0)
     env.data.lalo.tool.fp <- env.data.lalo.tool
     env.data.lalo.tool.fp[,42] <- aa.1
     colnames(env.data.lalo.tool.fp)[42] <- "Flood_plain(1 natural, 2 agriculture area, 3 road, 4 parking lot, 5 trail, 6 etc)"
@@ -217,7 +225,7 @@ BMI_all <- function(){
     
     species.abun.DF.na.omit <- species.abun.DF
     species.abun.DF.na.omit[is.na(species.abun.DF)] <- 0
-
+    
     t.chronomidae <- data.frame(t(species.abun.DF.na.omit[which(rownames(species.abun.DF.na.omit) %in% C.code.list),]))
     t.chronomidae[,7] <- t.chronomidae[,1]
     t.chronomidae[,8] <- rowSums(t.chronomidae[,2:6])
@@ -226,7 +234,7 @@ BMI_all <- function(){
     species.abun.final <- species.abun.DF.na.omit
     species.abun.final[which(rownames(species.abun.final) == "M00699"),] <- chronomidae.sum[7,] 
     species.abun.final[which(rownames(species.abun.final) == "M00698"),] <- chronomidae.sum[8,] 
-
+    
     colnames(BMI_env.t) <- BMI_env.t[1,]
     BMI_env.t2 <- BMI_env.t[-1,]
     DB.form.Benthic_invertebrate <- rbind(BMI_env.t2, species.abun.final)
