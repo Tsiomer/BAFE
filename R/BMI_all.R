@@ -126,7 +126,7 @@ BMI_all <- function(){
     for(i in 1:length(env.data.lalo$investigate_tools)){
         if(env.data.lalo$investigate_tools[i] == "Dredge"){
             tool.matrix[i,3] <- env.data.lalo$tool_number[i]
-        }else if(env.data.lalo$investigate_tools[i] == "Surburnet"){
+        }else if(env.data.lalo$investigate_tools[i] == "Surbernet"){
             if(env.data.lalo$tool_width == 30){
                 tool.matrix[i,1] <- env.data.lalo$tool_number[i]
             }else if(env.data.lalo$tool_width == 50){
