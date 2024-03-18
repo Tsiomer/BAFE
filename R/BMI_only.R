@@ -15,7 +15,11 @@ BMI_only <- function(){
         stop("need to check species investigate data")
     }
     
-    raw.abun.1 <- raw.abun[-which(is.na(raw.abun$inds)),]
+    if((T %in% is.na(raw.abun$inds))==TRUE){
+        raw.abun.1 <- raw.abun[-which(is.na(raw.abun$inds)),]
+    }else{
+        raw.abun.1 <- raw.abun
+    }
     
     species_list <- data.frame(readxl::read_excel(filepath.1, sheet = 3))[,-c(4:7)]
     if( sum(names(species_list) == c("species_name", "Species_Code", "scientific_name","saprobic_value", "indicator_weight_value", "endangered_species_1","endangered_species_2","Korea_endemic")) != 8 ){
