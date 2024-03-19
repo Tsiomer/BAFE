@@ -267,8 +267,8 @@ RVI_all <- function(){
     names(plant.spri.t)[1] <- "site_code"
     
     
-    DF.form.vegetation2.nt <- env.data.tf.lalo[,c(1:11,19:22,27:29)] %>%
-        merge(richness.data, by = "site_code") %>%
+    DF.form.vegetation2.nt <- env.data.tf.lalo[,c(1:11,19:22,27:29)] |>
+        merge(richness.data, by = "site_code") |>
         merge(plant.spri.t, by = "site_code")
     
     DF.form.vegetation2 <- data.frame(t(DF.form.vegetation2.nt))
