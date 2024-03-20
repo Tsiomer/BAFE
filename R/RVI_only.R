@@ -15,29 +15,35 @@ RVI_only <- function(){
     colnames(RVI.matrix) <- c("site_code","HAA","EA","WTD","SalFraA","ToSC","BTI")
     
     for(i in 1:dim(area.matrix)[2]){
-        aa <- area.matrix[-which(is.na(area.matrix[,i])),][i]
-        aa <- cbind(rownames(aa), aa)
-        colnames(aa) <- c("species_code","area")
-        bb <- species.list[which(species.list$species_code %in% rownames(aa)),]
-        cc <- merge(bb, aa, by = "species_code")
+        if((FALSE %in% is.na(area.matrix[,i])) == FALSE){
+            RVI.matrix$site_code[i] <- names(area.matrix)[i]
+            next
+        }else{
+            aa <- area.matrix[-which(is.na(area.matrix[,i])),][i]
+            aa <- cbind(rownames(aa), aa)
+            colnames(aa) <- c("species_code","area")
+            bb <- species.list[which(species.list$species_code %in% rownames(aa)),]
+            cc <- merge(bb, aa, by = "species_code")
+            
+            RVI.matrix$site_code[i] <- names(area.matrix)[i]
+            
+            RVI.matrix$HAA[i] <- sum(cc$area[cc$growth_type %in% c("HerbAn","ClimbAn")])/aa$area[1]*100
+            
+            RVI.matrix$EA[i] <- sum(cc$area[which(cc$introduced == "O")])/aa$area[1]*100
+            
+            RVI.matrix$WTD[i] <- sum((aa[-c(1:7),2]/aa[1,2])^2)
+            
+            RVI.matrix$SalFraA[i] <- sum(cc$area[which(cc$Salix_Fraxinus == "O")])/aa$area[1]*100
+            
+            species.richness.1 <- species.richness.sort[which(species.richness.sort$site_code.x == unique(species.richness.sort$site_code.x)[1]),]
+            species.richness.data <- species.list[which(species.list$species_code %in% species.richness.1$species_code),]
+            RVI.matrix$ToSC[i] <- length(which(species.richness.data$introduced == "O"))/dim(species.richness.data)[1]*100
+            
+            subset.1 <- subset(cross_section, site_code == site.list[i])
+            totallength <- max(subset.1$site_distance)
+            RVI.matrix$BTI[i] <- sum(subset.1$each_site_length*subset.1$wetland_appear_frequency_score*subset.1$land_use_type_score, na.rm = T)/totallength
+        }
         
-        RVI.matrix$site_code[i] <- names(area.matrix)[i]
-        
-        RVI.matrix$HAA[i] <- sum(cc$area[cc$growth_type %in% c("HerbAn","ClimbAn")])/aa$area[1]*100
-        
-        RVI.matrix$EA[i] <- sum(cc$area[which(cc$introduced == "O")])/aa$area[1]*100
-        
-        RVI.matrix$WTD[i] <- sum((aa[-c(1:7),2]/aa[1,2])^2)
-        
-        RVI.matrix$SalFraA[i] <- sum(cc$area[which(cc$Salix_Fraxinus == "O")])/aa$area[1]*100
-        
-        species.richness.1 <- species.richness.sort[which(species.richness.sort$site_code.x == unique(species.richness.sort$site_code.x)[1]),]
-        species.richness.data <- species.list[which(species.list$species_code %in% species.richness.1$species_code),]
-        RVI.matrix$ToSC[i] <- length(which(species.richness.data$introduced == "O"))/dim(species.richness.data)[1]*100
-        
-        subset.1 <- subset(cross_section, site_code == site.list[i])
-        totallength <- max(subset.1$site_distance)
-        RVI.matrix$BTI[i] <- sum(subset.1$each_site_length*subset.1$wetland_appear_frequency_score*subset.1$land_use_type_score, na.rm = T)/totallength
     }
     RVI.matrix
     
