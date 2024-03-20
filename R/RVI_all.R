@@ -15,29 +15,35 @@ RVI_all <- function(){
     colnames(RVI.matrix) <- c("site_code","HAA","EA","WTD","SalFraA","ToSC","BTI")
     
     for(i in 1:dim(area.matrix)[2]){
-        aa <- area.matrix[-which(is.na(area.matrix[,i])),][i]
-        aa <- cbind(rownames(aa), aa)
-        colnames(aa) <- c("species_code","area")
-        bb <- species.list[which(species.list$species_code %in% rownames(aa)),]
-        cc <- merge(bb, aa, by = "species_code")
-
-        RVI.matrix$site_code[i] <- names(area.matrix)[i]
+        if((FALSE %in% is.na(area.matrix[,i])) == FALSE){
+            RVI.matrix$site_code[i] <- names(area.matrix)[i]
+            next
+        }else{
+            aa <- area.matrix[-which(is.na(area.matrix[,i])),][i]
+            aa <- cbind(rownames(aa), aa)
+            colnames(aa) <- c("species_code","area")
+            bb <- species.list[which(species.list$species_code %in% rownames(aa)),]
+            cc <- merge(bb, aa, by = "species_code")
+            
+            RVI.matrix$site_code[i] <- names(area.matrix)[i]
+            
+            RVI.matrix$HAA[i] <- sum(cc$area[cc$growth_type %in% c("HerbAn","ClimbAn")])/aa$area[1]*100
+            
+            RVI.matrix$EA[i] <- sum(cc$area[which(cc$introduced == "O")])/aa$area[1]*100
+            
+            RVI.matrix$WTD[i] <- sum((aa[-c(1:7),2]/aa[1,2])^2)
+            
+            RVI.matrix$SalFraA[i] <- sum(cc$area[which(cc$Salix_Fraxinus == "O")])/aa$area[1]*100
+            
+            species.richness.1 <- species.richness.sort[which(species.richness.sort$site_code.x == unique(species.richness.sort$site_code.x)[1]),]
+            species.richness.data <- species.list[which(species.list$species_code %in% species.richness.1$species_code),]
+            RVI.matrix$ToSC[i] <- length(which(species.richness.data$introduced == "O"))/dim(species.richness.data)[1]*100
+            
+            subset.1 <- subset(cross_section, site_code == site.list[i])
+            totallength <- max(subset.1$site_distance)
+            RVI.matrix$BTI[i] <- sum(subset.1$each_site_length*subset.1$wetland_appear_frequency_score*subset.1$land_use_type_score, na.rm = T)/totallength
+        }
         
-        RVI.matrix$HAA[i] <- sum(cc$area[cc$growth_type %in% c("HerbAn","ClimbAn")])/aa$area[1]*100
-        
-        RVI.matrix$EA[i] <- sum(cc$area[which(cc$introduced == "O")])/aa$area[1]*100
-        
-        RVI.matrix$WTD[i] <- sum((aa[-c(1:7),2]/aa[1,2])^2)
-        
-        RVI.matrix$SalFraA[i] <- sum(cc$area[which(cc$Salix_Fraxinus == "O")])/aa$area[1]*100
-        
-        species.richness.1 <- species.richness.sort[which(species.richness.sort$site_code.x == unique(species.richness.sort$site_code.x)[1]),]
-        species.richness.data <- species.list[which(species.list$species_code %in% species.richness.1$species_code),]
-        RVI.matrix$ToSC[i] <- length(which(species.richness.data$introduced == "O"))/dim(species.richness.data)[1]*100
-        
-        subset.1 <- subset(cross_section, site_code == site.list[i])
-        totallength <- max(subset.1$site_distance)
-        RVI.matrix$BTI[i] <- sum(subset.1$each_site_length*subset.1$wetland_appear_frequency_score*subset.1$land_use_type_score, na.rm = T)/totallength
     }
     RVI.matrix
     
@@ -57,9 +63,9 @@ RVI_all <- function(){
     
     approach.status <- data.frame(env.data$site_code,env.data$invetigate_no)
     colnames(approach.status) <- c("site_code","invetigate_no")
-
+    
     approach.status$invetigate_no[is.na(approach.status$invetigate_no)] <- "-"
-
+    
     
     score.ingage$RVI_special_issue <- score.ingage$RVI
     score.ingage$RVI_special_issue[score.ingage$site_code %in% approach.status$site_code[!(approach.status$invetigate_no == "-")]] <- "-"
@@ -78,7 +84,7 @@ RVI_all <- function(){
     names(score.ingage.2)[10] <- "RVI.rank"
     
     
-
+    
     latitude <- paste(env.data$lat_degree, env.data$lat_minute, env.data$lat_second)
     longitude <- paste(env.data$long_degree, env.data$long_minute, env.data$long_second)
     
@@ -99,7 +105,7 @@ RVI_all <- function(){
     env.data.tf.lalo <- env.data.tf[,-c(16:21,23:28)]
     
     colnames(env.data.tf.lalo)[10:15]<- c("latitude","longitude","lat_start","long_start","lat_end","long_end")
-
+    
     dominant_data <- data.frame(matrix(nrow = dim(area.matrix)[2], ncol = 21))
     
     colnames(dominant_data) <- c("site_code",
@@ -130,7 +136,7 @@ RVI_all <- function(){
         colnames(aa) <- c("species_code","area")
         bb <- species.list[which(species.list$species_code %in% rownames(aa)),]
         cc <- merge(bb, aa, by = "species_code")
-
+        
         dominant_data$site_code[i] <- colnames(area.matrix)[i]
         
         dominant_data$Salix_ratio[i] <- length(which(cc$genus %in% "Salix"))/(dim(aa)[1]-7)
@@ -165,7 +171,7 @@ RVI_all <- function(){
         
         
     }
-
+    
     except.plant <- data.frame(colnames(area.matrix),t(area.matrix[2:7,]))
     names(except.plant)[1:7] <- c("site_code","watercourse","barren","artificial_structure","forest_vegetation","residential_commercial","agriculture")
     
@@ -175,10 +181,16 @@ RVI_all <- function(){
     
     whole.area.num <- data.frame(matrix(nrow=dim(area.matrix)[2],ncol = 3))
     for(i in 1:dim(area.matrix)[2]){
-        aa <- area.matrix[-which(is.na(area.matrix[,i])),][i]
-        whole.area.num[i,1] <- names(aa)
-        whole.area.num[i,2] <- c(dim(aa)[1]-7)
-        whole.area.num[i,3] <- aa[1,1]
+        if((FALSE %in% is.na(area.matrix[,i])) == FALSE){
+            whole.area.num[i,1] <- names(area.matrix)[i]
+            whole.area.num[i,2] <- NA
+            whole.area.num[i,3] <- NA
+        }else{
+            aa <- area.matrix[-which(is.na(area.matrix[,i])),][i]
+            whole.area.num[i,1] <- names(aa)
+            whole.area.num[i,2] <- c(dim(aa)[1]-7)
+            whole.area.num[i,3] <- aa[1,1]
+        }
     }
     names(whole.area.num) <- c("site_code","total_communties","total_area")
     
@@ -193,7 +205,7 @@ RVI_all <- function(){
     
     DF.form.vegetation1 <- data.frame(t(DF.form.vegetation1.nt))
     
-    write.csv(DF.form.vegetation1, "DF.form.vegetation1.csv", fileEncoding = "EUC-KR") 
+    write.csv(DF.form.vegetation1, "DF.form.vegetation_area.csv", fileEncoding = "EUC-KR") 
     
     plant.spri <- data.frame(matrix(nrow = dim(species.list)[1], ncol = length(site.list)))
     rownames(plant.spri) <- species.list$species_code
@@ -206,6 +218,7 @@ RVI_all <- function(){
             plant.spri[temp.index,i] <- 1
         }
     }
+    plant.spri
     
     richness.data <- data.frame(matrix(nrow = dim(plant.spri)[2], ncol = 12))
     colnames(richness.data) <- c("site_code",
@@ -273,7 +286,7 @@ RVI_all <- function(){
     
     DF.form.vegetation2 <- data.frame(t(DF.form.vegetation2.nt))
     
-    write.csv(DF.form.vegetation2, "DF.form.vegetation2.csv", fileEncoding = "EUC-KR")
+    write.csv(DF.form.vegetation2, "DF.form.flora.csv", fileEncoding = "EUC-KR")
     
     cross_section.DF <- data.frame(matrix(nrow = 450, ncol = length(site.list)+2))
     cross_section.DF[,1] <- rep(x=1:30, each=15)
@@ -282,46 +295,53 @@ RVI_all <- function(){
     cross_section2 <- data.frame(cross_section[,1:4],cross_section$relative_height, cross_section[,5:16]) 
     cross_section.DF[,2] <- rep(x=colnames(cross_section2)[3:17], times = 30)
     
-    
     for(i in 1:length(site.list)){
-        cross_section.temp <- cross_section2[which(cross_section2$site_code == site.list[i]),]
-        for(j in 1:dim(cross_section.temp)[1]){
-            min.num <- min(which(cross_section.DF$site_number %in% cross_section.temp$site_number[j]))
-            max.num <- max(which(cross_section.DF$site_number %in% cross_section.temp$site_number[j]))
-            temp.survey <- t(cross_section.temp[j,3:dim(cross_section.temp)[2]])
-            cross_section.DF[min.num:max.num,i+2] <- temp.survey
+        if((site.list[i] %in% cross_section2$site_code) == FALSE){
+            next
+        }else{
+            cross_section.temp <- cross_section2[which(cross_section2$site_code == site.list[i]),]
+            for(j in 1:dim(cross_section.temp)[1]){
+                min.num <- min(which(cross_section.DF$site_number %in% cross_section.temp$site_number[j]))
+                max.num <- max(which(cross_section.DF$site_number %in% cross_section.temp$site_number[j]))
+                temp.survey <- t(cross_section.temp[j,3:dim(cross_section.temp)[2]])
+                cross_section.DF[min.num:max.num,i+2] <- temp.survey
+            }
         }
-        
     }
     cross_section.DF 
     species.appear.cs <- species.appear[-which(species.appear$site_number == 0),]
-
+    
     observed.plant.DF <- data.frame(matrix(nrow = 115, ncol = length(site.list)+2))
     observed.plant.DF[,1] <- c(rep(c("T1","T2"), each = 10), rep(c("S"), times = 15), rep(c("H"), times = 80))
     observed.plant.DF[,2] <- 1:115
     colnames(observed.plant.DF) <- c("structure", "number", site.list)
     
     for(i in 1:length(site.list)){
-        observed.plant.site.temp <- species.appear.cs[which(species.appear.cs$site_code == site.list[i]),] 
-        S.species <- unique(observed.plant.site.temp$species_code[which(observed.plant.site.temp$structure == "S")])
-        T1.species <- unique(observed.plant.site.temp$species_code[which(observed.plant.site.temp$structure == "T1")])
-        T2.species <- unique(observed.plant.site.temp$species_code[which(observed.plant.site.temp$structure == "T2")])
-        H.species <- unique(observed.plant.site.temp$species_code[which(observed.plant.site.temp$structure == "H")])
-        
-        if(length(S.species) != 0){
-            observed.plant.DF[,i+2][min(which(observed.plant.DF$structure == "S")):c(min(which(observed.plant.DF$structure == "S"))+length(S.species)-1)] <- S.species
-        } 
-        
-        if(length(T1.species) != 0){
-            observed.plant.DF[,i+2][min(which(observed.plant.DF$structure == "T1")):c(min(which(observed.plant.DF$structure == "T1"))+length(T1.species)-1)] <- T1.species
-        } 
-        
-        if(length(T2.species) != 0){
-            observed.plant.DF[,i+2][min(which(observed.plant.DF$structure == "T2")):c(min(which(observed.plant.DF$structure == "T2"))+length(T2.species)-1)] <- T2.species
-        } 
-        if(length(H.species) != 0){
-            observed.plant.DF[,i+2][min(which(observed.plant.DF$structure == "H")):c(min(which(observed.plant.DF$structure == "H"))+length(H.species)-1)] <- H.species
+        if((site.list[i] %in% species.appear.cs$site_code) == FALSE){
+            next
+        }else{
+            observed.plant.site.temp <- species.appear.cs[which(species.appear.cs$site_code == site.list[i]),] 
+            S.species <- unique(observed.plant.site.temp$species_code[which(observed.plant.site.temp$structure == "S")])
+            T1.species <- unique(observed.plant.site.temp$species_code[which(observed.plant.site.temp$structure == "T1")])
+            T2.species <- unique(observed.plant.site.temp$species_code[which(observed.plant.site.temp$structure == "T2")])
+            H.species <- unique(observed.plant.site.temp$species_code[which(observed.plant.site.temp$structure == "H")])
+            
+            if(length(S.species) != 0){
+                observed.plant.DF[,i+2][min(which(observed.plant.DF$structure == "S")):c(min(which(observed.plant.DF$structure == "S"))+length(S.species)-1)] <- S.species
+            } 
+            
+            if(length(T1.species) != 0){
+                observed.plant.DF[,i+2][min(which(observed.plant.DF$structure == "T1")):c(min(which(observed.plant.DF$structure == "T1"))+length(T1.species)-1)] <- T1.species
+            } 
+            
+            if(length(T2.species) != 0){
+                observed.plant.DF[,i+2][min(which(observed.plant.DF$structure == "T2")):c(min(which(observed.plant.DF$structure == "T2"))+length(T2.species)-1)] <- T2.species
+            } 
+            if(length(H.species) != 0){
+                observed.plant.DF[,i+2][min(which(observed.plant.DF$structure == "H")):c(min(which(observed.plant.DF$structure == "H"))+length(H.species)-1)] <- H.species
+            }
         }
+        
     }
     
     observed.plant.DF
@@ -357,9 +377,9 @@ RVI_all <- function(){
     
     survey_site.dominance_rank
     
-
+    
     cross_section.DF.2 <- cbind(c(1:450),cross_section.DF)
-
+    
     env.data.dom <- data.frame(cbind(rep(NA,times = 22),
                                      rep(NA,times = 22),
                                      rownames(t(env.data.tf.lalo[,c(1:9,21,22,12,13,16,14,15,17,18,23:26)])),
@@ -372,6 +392,6 @@ RVI_all <- function(){
     cross_section.DF.2$X1 <- c("cross_section",rep(NA, times = dim(cross_section.DF.2)[1]-1))
     
     DB.form.vegetation3 <- data.frame(rbind(env.data.dom, cross_section.DF.2, observed.plant.DF.CN, survey_site.dominance_rank))
-    write.csv(DB.form.vegetation3, file = "DB.form.vegetation3.csv", fileEncoding = "EUC-KR",row.names = F)
+    write.csv(DB.form.vegetation3, file = "DB.form.crosssection.csv", fileEncoding = "EUC-KR",row.names = F)
     
 }
