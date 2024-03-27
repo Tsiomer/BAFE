@@ -1,9 +1,9 @@
 Package: KFEBMAIC
 Title: calculating the index for Korea Freshwater Ecosystem Biological Monitoring and Assessment
 Version: 0.0.1
-Authors@R: 
-    person("Dongwon", "Shim", email = "siomer@khu.ac.kr", role = c("aut", "cre"))
-    person("Youngseuk", "Park", email = "parkys@khu.ac.kr", role = "aut")
+Authors@R: c(
+    person("Dongwon", "Shim", email = "siomer@khu.ac.kr", role = c("aut", "cre")),
+    person("Youngseuk", "Park", email = "parkys@khu.ac.kr", role = "aut"))
 Description: The package calculates each index based on survey data from four taxa.    
             It also creates a csv file that represents the survey results by point for each taxa.
 License: MIT + file LICENSE
