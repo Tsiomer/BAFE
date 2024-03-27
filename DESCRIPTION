@@ -1,6 +1,5 @@
 Package: KFEBMAIC
 Title: calculating the index for Korea Freshwater Ecosystem Biological Monitoring and Assessment
-
 Version: 0.0.1
 Authors@R: 
     person("Dongwon", "Shim", email = "siomer@khu.ac.kr", role = c("aut", "cre"))
