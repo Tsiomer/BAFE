@@ -1,5 +1,6 @@
-Package: KFEBMAIC
-Title: calculating the index for Korea Freshwater Ecosystem Biological Monitoring and Assessment
+Package: HABAEK
+Title: Health Assessment of Biological Aquatic Ecosystem in Korea
+    calculating the index for Korea Freshwater Ecosystem Biological Monitoring and Assessment
 Version: 0.0.1
 Authors@R: c(
     person("Dongwon", "Shim", email = "siomer@khu.ac.kr", role = c("aut", "cre")),
