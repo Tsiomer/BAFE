@@ -1,5 +1,5 @@
-Package: HABAEK
-Title: Health Assessment of Biological Aquatic Ecosystem in Korea
+Package: BAFE
+Title: Biological Assessment for Freshwater Ecosystems,
     calculating the index for Korea Freshwater Ecosystem Biological Monitoring and Assessment
 Version: 0.0.1
 Authors@R: c(
