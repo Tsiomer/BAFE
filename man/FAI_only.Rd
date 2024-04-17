@@ -4,13 +4,13 @@
 \alias{FAI_only}
 \title{FAI calculation}
 \usage{
-FAI_only()
+FAI_only(FAI_WS_only = T, FAI_GR_only = T)
 }
 \arguments{
-\item{x}{: Excel file that selected in pop-up window}
+\item{filepath}{Decide whether to set filepath or not}
 }
 \description{
-This function generate FAI and rank of each site
+This function generate FAI and rank of each site using all survey data
 This fucntion operate without parameter, you just operate function
 }
 \examples{
