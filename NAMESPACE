@@ -2,6 +2,10 @@
 
 export(BMI_all)
 export(BMI_only)
+export(FAI_GR)
+export(FAI_GR_only)
+export(FAI_WS)
+export(FAI_WS_only)
 export(FAI_all)
 export(FAI_only)
 export(RVI_all)
