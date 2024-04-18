@@ -7,7 +7,7 @@
 #' @examples
 #' FAI_WS()
 
-FAI_WS <- function(filepath){
+FAI_WS <- function(filepath = NA){
     if(is.na(filepath) == T){
         filepath.1 <- file.choose()
     }
