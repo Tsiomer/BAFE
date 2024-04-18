@@ -7,7 +7,7 @@
 #' @examples
 #' FAI_GR()
 
-FAI_GR <- function(filepath){
+FAI_GR <- function(filepath = NA){
     if(is.na(filepath) == T){
         filepath.1 <- file.choose()
     }
