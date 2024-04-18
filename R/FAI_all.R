@@ -9,10 +9,10 @@
 FAI_all <- function(FAI_WS = T, FAI_GR = T){
     filepath.1 <- file.choose()
     if(FAI_WS){
-        FAI_WS(filepath = F)
+        FAI_WS(filepath.1)
     }
     if(FAI_GR){
-        FAI_GR(filepath = F)
+        FAI_GR(filepath.1)
     }
 }
 
