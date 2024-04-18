@@ -7,10 +7,11 @@
 #' @examples
 #' FAI_WS()
 
-FAI_WS <- function(filepath = T){
-    if(filepath){
+FAI_WS <- function(filepath){
+    if(filepath == NA){
         filepath.1 <- file.choose()
     }
+    filepath.1 <- filepath
     raw.abun <- data.frame(readxl::read_excel(filepath.1, sheet = 4, skip = 1))
     raw.abun
 
