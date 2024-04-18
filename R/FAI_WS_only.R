@@ -10,6 +10,8 @@
 FAI_WS_only <- function(filepath = NA){
     if(is.na(filepath) == T){
         filepath.1 <- file.choose()
+    }else{
+        filepath.1 <- filepath
     }
     filepath.1 <- filepath
     raw.abun <- data.frame(readxl::read_excel(filepath.1, sheet = 4, skip = 1))
