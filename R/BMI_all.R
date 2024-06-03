@@ -211,10 +211,12 @@ BMI_all <- function(){
     rownames(species.abun.DF) <- species_list$Species_Code
 
     for(i in 1:dim(BMI_env.t)[2]){
+
         temp.abun <- subset(raw.abun.1, site_code == BMI_env.t[1,i])
+        k <- which(colnames(species.abun.DF) == BMI_env.t[1,i])
 
         for(j in 1:dim(temp.abun)[1]){
-            species.abun.DF[which(rownames(species.abun.DF) == temp.abun$Species_Code[j]),i] <- temp.abun$inds[j]
+            species.abun.DF[which(rownames(species.abun.DF) == temp.abun$Species_Code[j]),k] <- temp.abun$inds[j]
         }
 
     }
