@@ -56,7 +56,7 @@ RVI_data.transform <- function(){
     species.richness.sort <- species.richness[order(species.richness$site_code),]
 
 
-    species.list <- data.frame(readxl::read_excel(filepath.1, sheet = 5, skip = 1))
+    species.list <- data.frame(readxl::read_excel(filepath.1, sheet = 5, skip = 1, col_types = "text"))
 
     if( sum(names(species.list) == c("wetland_appear_frequency", "growth_type", "naturalized", "cultivar", "introduced", "Salix_Fraxinus",
                                      "Salix_Fraxinus_Alnus_Ulmus", "tolerant", "ecosystem_disturb", "rare", "endemic", "endangered",
@@ -144,7 +144,12 @@ RVI_data.transform <- function(){
             if(length(zero.index) == 1){
                 height1 <- rev(cumsum(rev(data.frame(packets[[1]])[,19])))
                 height.end <- cumsum(data.frame(packets[[length(packets)]])[,19])
-                relative.height <- c(height1,0,height.end)
+                if(zero.index == 1){
+                    relative.height <- c(height1,height.end)
+                }else{
+                    relative.height <- c(height1,0,height.end)
+                }
+
             }else if(length(zero.index) > 1){
 
                 height1 <- rev(cumsum(rev(data.frame(packets[[1]])[,19])))
@@ -176,8 +181,7 @@ RVI_data.transform <- function(){
                 relative.height <- c(height1,rehe_between,0,height.end)
             }
             relative.height
-            cross_section$relative_height[min(which(cross_section$site_code %in% site.list[j])):max(which(cross_section$site_code %in% site.list[j]))] <-  relative.height
-
+            cross_section$relative_height[min(which(cross_section$site_code %in% site.list[j])):max(which(cross_section$site_code %in% site.list[j]))] <- relative.height
         }
 
     }
