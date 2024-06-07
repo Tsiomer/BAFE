@@ -209,23 +209,23 @@ RVI_all <- function(){
         merge(score.ingage.2, by = "site_code") |>
         merge(whole.area.num, by = "site_code") |>
         merge(only.plant, by = "site_code")
+    DF.form.vegetation1.nt[1:5,1:5]
 
     DF.form.vegetation1 <- data.frame(t(DF.form.vegetation1.nt))
 
-    write.csv(DF.form.vegetation1, "DF.form.vegetation_area.csv", fileEncoding = "EUC-KR")
+    write.csv(DF.form.vegetation1, "DB.form.vegetation_area.csv", fileEncoding = "EUC-KR")
 
     plant.spri <- data.frame(matrix(nrow = dim(species.list)[1], ncol = length(site.list)))
     rownames(plant.spri) <- species.list$species_code
 
     for(i in 1:length(site.list)){
         colnames(plant.spri)[i] <- site.list[i]
-        temp.species <- species.richness.sort$species_code[species.richness.sort$site_code.x %in% site.list[i]]
+        temp.species <- species.appear$species_code[species.appear$site_code %in% site.list[i]]
         for(j in 1:length(temp.species)){
             temp.index <- which(rownames(plant.spri) == temp.species[j])
             plant.spri[temp.index,i] <- 1
         }
     }
-    plant.spri
 
     richness.data <- data.frame(matrix(nrow = dim(plant.spri)[2], ncol = 12))
     colnames(richness.data) <- c("site_code",
@@ -293,7 +293,7 @@ RVI_all <- function(){
 
     DF.form.vegetation2 <- data.frame(t(DF.form.vegetation2.nt))
 
-    write.csv(DF.form.vegetation2, "DF.form.vegetation_PA.csv", fileEncoding = "EUC-KR")
+    write.csv(DF.form.vegetation2, "DB.form.vegetation_PA.csv", fileEncoding = "EUC-KR")
 
     cross_section.DF <- data.frame(matrix(nrow = 450, ncol = length(site.list)+2))
     cross_section.DF[,1] <- rep(x=1:30, each=15)
