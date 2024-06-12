@@ -67,9 +67,6 @@ RVI_data.transform <- function(){
     species.richness.sort <- species.richness[order(species.richness$site_code),]
     species.list <- data.frame(readxl::read_excel(filepath.1, sheet = 5, skip = 1, col_types = "text"))
 
-
-    species.list <- data.frame(readxl::read_excel(filepath.1, sheet = 5, skip = 1, col_types = "text"))
-
     if( sum(names(species.list) == c("wetland_appear_frequency", "growth_type", "naturalized", "cultivar", "introduced", "Salix_Fraxinus",
                                      "Salix_Fraxinus_Alnus_Ulmus", "tolerant", "ecosystem_disturb", "rare", "endemic", "endangered",
                                      "family", "family_Korea", "genus", "species_name", "scientific_name", "species_code", "label")) != 19 ){
@@ -138,62 +135,114 @@ RVI_data.transform <- function(){
             next
         }else{
             temp.site <- cross_section[which(cross_section$site_code == site.list[j]),]
-            zero.index <- which(temp.site$site_height %in% 0)
+            zero.index <- which(temp.site$depth != 0)
+
+            temp.site$depth
             zero.index
             packets <- list()
+
             for(i in 0:length(zero.index)){
-                if(i == 0){
-                    packets[[i+1]] <- list(temp.site[1:(zero.index[1]-1),])
-                }else if(i > 0 & i < length(zero.index)){
-                    packets[[i+1]] <- temp.site[c((zero.index[i]+1):(zero.index[i+1]-1)),]
+                if(zero.index[1] == 1 & length(zero.index) == 1){
+                    if(i == 0){
+                        packets[[i+1]] <- temp.site[-zero.index,]
+                    }else{
+                        break
+                    }
+
+                }else if(zero.index[1] == 1 & length(zero.index) > 1){
+
+                    if(i == 0){
+                        packets[[i+1]] <- temp.site[2:(zero.index[2]-1),]
+                    }else if(i > 0 & i < length(zero.index)){
+                        if(i == 1){
+                            next
+                        }else{
+                            packets[[i]] <- temp.site[c((zero.index[i]+1):(zero.index[i+1]-1)),]
+                        }
+                    }else{
+                        packets[[i]] <- temp.site[c((zero.index[i]+1):dim(temp.site)[1]),]
+                    }
                 }else{
-                    packets[[i+1]] <- temp.site[c((zero.index[i]+1):dim(temp.site)[1]),]
+                    if(i == 0){
+                        packets[[i+1]] <- temp.site[1:(zero.index[1]-1),]
+                    }else if(i > 0 & i < length(zero.index)){
+                        packets[[i+1]] <- temp.site[c((zero.index[i]+1):(zero.index[i+1]-1)),]
+                    }else{
+                        packets[[i+1]] <- temp.site[c((zero.index[i]+1):dim(temp.site)[1]),]
+                    }
                 }
+
             }
-            packets
-
-
             if(length(zero.index) == 1){
                 height1 <- rev(cumsum(rev(data.frame(packets[[1]])[,19])))
                 height.end <- cumsum(data.frame(packets[[length(packets)]])[,19])
                 if(zero.index == 1){
-                    relative.height <- c(height1,height.end)
+                    relative.height <- c(0, height.end)
                 }else{
                     relative.height <- c(height1,0,height.end)
                 }
 
             }else if(length(zero.index) > 1){
-
-                height1 <- rev(cumsum(rev(data.frame(packets[[1]])[,19])))
-                height.end <- cumsum(data.frame(packets[[length(packets)]])[,19])
-
-                for(k in 1:(length(zero.index)-1)){
-                    packet.b.0 <- data.frame(packets[[k+1]])[,19]
-                    if(length(packet.b.0)%% 2 == 0){
-                        right_half <- cumsum(packet.b.0[1:(length(packet.b.0)/2)])
-                        left_half <- rev(cumsum(rev(packet.b.0[((length(packet.b.0)/2)+1):length(packet.b.0)])))
-                        total.rehe <- c(right_half, left_half)
-                    }else{
-                        if(length(packet.b.0)==1){
-                            total.rehe <- packet.b.0
-                        }else{
-                            right_half <- cumsum(packet.b.0[1:((length(packet.b.0)+1)/2)])
-                            left_half <- rev(cumsum(rev(packet.b.0[(((length(packet.b.0)+1)/2)+1):length(packet.b.0)])))
+                if(1 %in% zero.index){
+                    height1 <- rev(cumsum(rev(data.frame(packets[[1]])[,19])))
+                    for(k in 1:(length(zero.index)-1)){
+                        packet.b.0 <- data.frame(packets[[k+1]])[,19]
+                        if(length(packet.b.0)%% 2 == 0){
+                            right_half <- cumsum(packet.b.0[1:(length(packet.b.0)/2)])
+                            left_half <- rev(cumsum(rev(packet.b.0[((length(packet.b.0)/2)+1):length(packet.b.0)])))
                             total.rehe <- c(right_half, left_half)
+                        }else{
+                            if(length(packet.b.0)==1){
+                                total.rehe <- packet.b.0
+                            }else{
+                                right_half <- cumsum(packet.b.0[1:((length(packet.b.0)+1)/2)])
+                                left_half <- rev(cumsum(rev(packet.b.0[(((length(packet.b.0)+1)/2)+1):length(packet.b.0)])))
+                                total.rehe <- c(right_half, left_half)
+                            }
+
+                        }
+                        if(k==1){
+                            rehe_between <- c(0,total.rehe)
+                        }else{
+                            rehe_between <- c(rehe_between,0,total.rehe)
                         }
 
                     }
-                    if(k==1){
-                        rehe_between <- c(0,total.rehe)
-                    }else{
-                        rehe_between <- c(rehe_between,0,total.rehe)
-                    }
+                    relative.height <- c(0,height1,rehe_between)
+                }else{
+                    height1 <- rev(cumsum(rev(data.frame(packets[[1]])[,19])))
+                    height.end <- cumsum(data.frame(packets[[length(packets)]])[,19])
 
+                    for(k in 1:(length(zero.index)-1)){
+                        packet.b.0 <- data.frame(packets[[k+1]])[,19]
+                        if(length(packet.b.0)%% 2 == 0){
+                            right_half <- cumsum(packet.b.0[1:(length(packet.b.0)/2)])
+                            left_half <- rev(cumsum(rev(packet.b.0[((length(packet.b.0)/2)+1):length(packet.b.0)])))
+                            total.rehe <- c(right_half, left_half)
+                        }else{
+                            if(length(packet.b.0)==1){
+                                total.rehe <- packet.b.0
+                            }else{
+                                right_half <- cumsum(packet.b.0[1:((length(packet.b.0)+1)/2)])
+                                left_half <- rev(cumsum(rev(packet.b.0[(((length(packet.b.0)+1)/2)+1):length(packet.b.0)])))
+                                total.rehe <- c(right_half, left_half)
+                            }
+
+                        }
+                        if(k==1){
+                            rehe_between <- c(0,total.rehe)
+                        }else{
+                            rehe_between <- c(rehe_between,0,total.rehe)
+                        }
+
+                    }
+                    relative.height <- c(height1,rehe_between,0,height.end)
                 }
-                relative.height <- c(height1,rehe_between,0,height.end)
+
             }
             relative.height
             cross_section$relative_height[min(which(cross_section$site_code %in% site.list[j])):max(which(cross_section$site_code %in% site.list[j]))] <- relative.height
+
         }
 
     }
