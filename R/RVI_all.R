@@ -42,7 +42,7 @@ RVI_all <- function(){
 
             RVI.matrix$SalFraA[i] <- sum(cc$area[which(cc$Salix_Fraxinus == "O")])/aa$area[1]*100
 
-            species.richness.1 <- species.richness.sort[which(species.richness.sort$site_code.x == unique(species.richness.sort$site_code.x)[1]),]
+            species.richness.1 <- species.richness.sort[which(species.richness.sort$site_code == unique(species.richness.sort$site_code)[i]),]
             species.richness.data <- species.list[which(species.list$species_code %in% species.richness.1$species_code),]
             RVI.matrix$ToSC[i] <- length(which(species.richness.data$introduced == "O"))/dim(species.richness.data)[1]*100
 
@@ -220,7 +220,7 @@ RVI_all <- function(){
 
     for(i in 1:length(site.list)){
         colnames(plant.spri)[i] <- site.list[i]
-        temp.species <- species.appear$species_code[species.appear$site_code %in% site.list[i]]
+        temp.species <- species.richness.sort$species_code[species.richness.sort$site_code %in% site.list[i]]
         for(j in 1:length(temp.species)){
             temp.index <- which(rownames(plant.spri) == temp.species[j])
             plant.spri[temp.index,i] <- 1
