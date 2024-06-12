@@ -50,10 +50,22 @@ RVI_data.transform <- function(){
     site.list <- unique(env.data$site_code)
 
     plant.area.species <- plant.area[-which(plant.area$label %in% c("w","a","d","m","h","ag1")),]
-    all.specieslist <- merge(species.appear,plant.area.species, by = "species_code")[,c(1,2,5)]
-    dim(all.specieslist)
+
+    plant.area.species2 <- data.frame(plant.area.species$species_code,
+                                      plant.area.species$site_code,
+                                      plant.area.species$species_name)
+    colnames(plant.area.species2) <- c("species_code", "site_code", "species_name")
+    species.appear2 <- data.frame(species.appear$species_code,
+                                  species.appear$site_code,
+                                  species.appear$species_name)
+    colnames(species.appear2) <- c("species_code", "site_code", "species_name")
+
+    all.specieslist <- rbind(species.appear2,plant.area.species2)
+
     species.richness <- all.specieslist[!duplicated(all.specieslist),]
+
     species.richness.sort <- species.richness[order(species.richness$site_code),]
+    species.list <- data.frame(readxl::read_excel(filepath.1, sheet = 5, skip = 1, col_types = "text"))
 
 
     species.list <- data.frame(readxl::read_excel(filepath.1, sheet = 5, skip = 1, col_types = "text"))
