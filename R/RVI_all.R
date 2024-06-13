@@ -98,8 +98,8 @@ RVI_all <- function(){
     latitude.start <- paste(env.data$lat_degree_start, env.data$lat_minute_start, env.data$lat_second_start)
     longitude.start <- paste(env.data$long_degree_start, env.data$long_minute_start, env.data$long_second_start)
 
-    latitude.end <- paste0(env.data$lat_degree_end,env.data$lat_minute_end, env.data$lat_second_end)
-    longitude.end <- paste0(env.data$long_degree_end,env.data$long_minute_end,env.data$long_second_end)
+    latitude.end <- paste(env.data$lat_degree_end,env.data$lat_minute_end, env.data$lat_second_end)
+    longitude.end <- paste(env.data$long_degree_end,env.data$long_minute_end,env.data$long_second_end)
 
     env.data.tf <- env.data
     colnames(env.data.tf)
