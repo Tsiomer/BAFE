@@ -47,6 +47,8 @@ RVI_data.transform <- function(){
         stop("need to check cross section data")
     }
 
+    env.data <- env.data[order(env.data$No.),]
+
     site.list <- unique(env.data$site_code)
 
     plant.area.species <- plant.area[-which(plant.area$label %in% c("w","a","d","m","h","ag1")),]
