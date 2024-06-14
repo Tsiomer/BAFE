@@ -398,7 +398,7 @@ RVI_all <- function(){
     names(observed.plant.DF.CN) <- names(env.data.dom)
     names(survey_site.dominance_rank) <- names(env.data.dom)
 
-    cross_section.DF.2$X1 <- c("cross_section",rep(NA, times = dim(cross_section.DF.2)[1]-1))
+    cross_section.DF.2$V1 <- c("cross_section",rep(NA, times = dim(cross_section.DF.2)[1]-1))
 
     DB.form.vegetation3 <- data.frame(rbind(env.data.dom, cross_section.DF.2, observed.plant.DF.CN, survey_site.dominance_rank))
     write.csv(DB.form.vegetation3, file = "DB.form.crosssection.csv", fileEncoding = "EUC-KR",row.names = F)
