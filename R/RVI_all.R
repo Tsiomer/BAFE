@@ -209,9 +209,10 @@ RVI_all <- function(){
         merge(score.ingage.2, by = "site_code") |>
         merge(whole.area.num, by = "site_code") |>
         merge(only.plant, by = "site_code")
-    DF.form.vegetation1.nt[1:5,1:5]
 
-    DF.form.vegetation1 <- data.frame(t(DF.form.vegetation1.nt))
+    DF.form.vegetation1.nt.sort <- DF.form.vegetation1.nt[order(DF.form.vegetation1.nt$No.),]
+
+    DF.form.vegetation1 <- data.frame(t(DF.form.vegetation1.nt.sort))
 
     write.csv(DF.form.vegetation1, "DB.form.vegetation_area.csv", fileEncoding = "EUC-KR")
 
@@ -290,8 +291,9 @@ RVI_all <- function(){
     DF.form.vegetation2.nt <- env.data.tf.lalo[,c(1:11,19:22,27:29)] |>
         merge(richness.data, by = "site_code") |>
         merge(plant.spri.t, by = "site_code")
+    DF.form.vegetation2.nt.sort <- DF.form.vegetation2.nt[order(DF.form.vegetation2.nt$No.),]
 
-    DF.form.vegetation2 <- data.frame(t(DF.form.vegetation2.nt))
+    DF.form.vegetation2 <- data.frame(t(DF.form.vegetation2.nt.sort))
 
     write.csv(DF.form.vegetation2, "DB.form.vegetation_PA.csv", fileEncoding = "EUC-KR")
 
