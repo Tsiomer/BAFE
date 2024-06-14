@@ -63,7 +63,7 @@ RVI_all <- function(){
 
     score.ingage <- data.frame(RVI.matrix$site_code, HAA.score, EA.score, WTD.score, SalFraA.score, ToSC.score, BTI.score)
     names(score.ingage)[1] <- "site_code"
-    score.ingage$RVI <- rowSums(score.ingage[,c(2:7)])*(10/3)
+    score.ingage$RVI <- round(rowSums(score.ingage[,c(2:7)])*(10/3),1)
 
     score.ingage$RVI.rank <- c("E","D","C","B","A")[cut(score.ingage$RVI, breaks = c(-1,15,30,50,65,100))]
 
