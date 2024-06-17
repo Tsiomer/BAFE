@@ -79,8 +79,6 @@ RVI_data.transform <- function(){
     rownames(area.matrix) <- c("total_area", species.list$species_code)
     colnames(area.matrix) <- site.list
 
-    area.matrix
-
     for(i in 1:dim(area.matrix)[2]){
         if((colnames(area.matrix)[i] %in% unique(plant.area$site_code)) == F){
             next
@@ -106,9 +104,7 @@ RVI_data.transform <- function(){
             }
         }
     }
-    area.matrix
 
-    cross_section
     for(i in 1: dim(cross_section)[1]){
         if(i==1){
             range.survey <-  cross_section$site_distance[i]
@@ -248,9 +244,11 @@ RVI_data.transform <- function(){
         }
 
     }
-
+    cross_section
     for(i in 1:length(cross_section$species_code)){
         if(i == 1){
+            species.list[species.list$species_code == "B00000",]
+
             temp <- species.list$wetland_appear_frequency[species.list$species_code == cross_section$species_code[i]]
             if(length(temp) == 0){
                 temp.2 <- "NA"
