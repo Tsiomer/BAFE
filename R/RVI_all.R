@@ -14,6 +14,7 @@ RVI_all <- function(){
     species.list <- x$species.list
     env.data <- x$env.data
     species.richness.sort <- x$species.richness.sort
+
     site.list <- x$site.list
     species.appear <- x$species.appear
 
@@ -29,26 +30,30 @@ RVI_all <- function(){
             aa <- area.matrix[-which(is.na(area.matrix[,i])),][i]
             aa <- cbind(rownames(aa), aa)
             colnames(aa) <- c("species_code","area")
+            veg.area <- sum(aa$area[8:length(aa$area)])
+
             bb <- species.list[which(species.list$species_code %in% rownames(aa)),]
             cc <- merge(bb, aa, by = "species_code")
 
             RVI.matrix$site_code[i] <- names(area.matrix)[i]
 
-            RVI.matrix$HAA[i] <- sum(cc$area[cc$growth_type %in% c("HerbAn","ClimbAn")])/aa$area[1]*100
+            RVI.matrix$HAA[i] <- sum(cc$area[cc$growth_type %in% c("HerbAn","ClimbAn")])/veg.area*100
 
-            RVI.matrix$EA[i] <- sum(cc$area[which(cc$introduced == "O")])/aa$area[1]*100
+            RVI.matrix$EA[i] <- sum(cc$area[which(cc$introduced == "O")])/veg.area*100
 
-            RVI.matrix$WTD[i] <- sum((aa[-c(1:7),2]/aa[1,2])^2)
+            RVI.matrix$WTD[i] <- sum((aa[-c(1:7),2]/veg.area)^2)
 
-            RVI.matrix$SalFraA[i] <- sum(cc$area[which(cc$Salix_Fraxinus == "O")])/aa$area[1]*100
+            RVI.matrix$SalFraA[i] <- sum(cc$area[which(cc$Salix_Fraxinus == "O")])/veg.area*100
 
             species.richness.1 <- species.richness.sort[which(species.richness.sort$site_code == unique(species.richness.sort$site_code)[i]),]
             species.richness.data <- species.list[which(species.list$species_code %in% species.richness.1$species_code),]
-            RVI.matrix$ToSC[i] <- length(which(species.richness.data$introduced == "O"))/dim(species.richness.data)[1]*100
+            RVI.matrix$ToSC[i] <- length(which(species.richness.data$tolerant  == "O"))/dim(species.richness.data)[1]*100
 
             subset.1 <- subset(cross_section, site_code == site.list[i])
             totallength <- max(subset.1$site_distance)
             RVI.matrix$BTI[i] <- sum(subset.1$each_site_length*subset.1$wetland_appear_frequency_score*subset.1$land_use_type_score, na.rm = T)/totallength
+
+            RVI.matrix[i,-1] <- round(RVI.matrix[i,-1],1)
         }
 
     }
@@ -141,42 +146,43 @@ RVI_all <- function(){
         aa <- area.matrix[-which(is.na(area.matrix[,i])),][i]
         aa <- cbind(rownames(aa), aa)
         colnames(aa) <- c("species_code","area")
+        veg.area <- sum(aa$area[8:length(aa$area)])
         bb <- species.list[which(species.list$species_code %in% rownames(aa)),]
         cc <- merge(bb, aa, by = "species_code")
 
         dominant_data$site_code[i] <- colnames(area.matrix)[i]
 
-        dominant_data$Salix_ratio[i] <- length(which(cc$genus %in% "Salix"))/(dim(aa)[1]-7)
-        dominant_data$Salix_area_ratio[i] <- sum(cc$area[which(cc$genus %in% "Salix")])/aa$area[1]*100
+        dominant_data$Salix_ratio[i] <- length(which(cc$genus %in% "Salix"))/(dim(aa)[1]-7)*100
+        dominant_data$Salix_area_ratio[i] <- sum(cc$area[which(cc$genus %in% "Salix")])/veg.area*100
 
-        dominant_data$Gramineae_ratio[i] <- length(which(cc$family %in% "Gramineae"))/(dim(aa)[1]-7)
-        dominant_data$Gramineae_area_ratio[i] <- sum(cc$area[which(cc$family %in% "Gramineae")])/aa$area[1]*100
+        dominant_data$Gramineae_ratio[i] <- length(which(cc$family %in% "Gramineae"))/(dim(aa)[1]-7)*100
+        dominant_data$Gramineae_area_ratio[i] <- sum(cc$area[which(cc$family %in% "Gramineae")])/veg.area*100
 
-        dominant_data$Cyperaceae_ratio[i] <- length(which(cc$family %in% "Cyperaceae"))/(dim(aa)[1]-7)
-        dominant_data$Cyperaceae_area_ratio[i] <- sum(cc$area[which(cc$family %in% "Cyperaceae")])/aa$area[1]*100
+        dominant_data$Cyperaceae_ratio[i] <- length(which(cc$family %in% "Cyperaceae"))/(dim(aa)[1]-7)*100
+        dominant_data$Cyperaceae_area_ratio[i] <- sum(cc$area[which(cc$family %in% "Cyperaceae")])/veg.area*100
 
-        dominant_data$OBL_ratio[i] <- length(which(cc$wetland_appear_frequency %in% "OBL"))/(dim(aa)[1]-7)
-        dominant_data$OBL_area_ratio[i] <- sum(cc$area[which(cc$wetland_appear_frequency %in% "OBL")])/aa$area[1]*100
+        dominant_data$OBL_ratio[i] <- length(which(cc$wetland_appear_frequency %in% "OBL"))/(dim(aa)[1]-7)*100
+        dominant_data$OBL_area_ratio[i] <- sum(cc$area[which(cc$wetland_appear_frequency %in% "OBL")])/veg.area*100
 
-        dominant_data$FACW_ratio[i] <- length(which(cc$wetland_appear_frequency %in% "FACW"))/(dim(aa)[1]-7)
-        dominant_data$FACW_area_ratio[i] <- sum(cc$area[which(cc$wetland_appear_frequency %in% "FACW")])/aa$area[1]*100
+        dominant_data$FACW_ratio[i] <- length(which(cc$wetland_appear_frequency %in% "FACW"))/(dim(aa)[1]-7)*100
+        dominant_data$FACW_area_ratio[i] <- sum(cc$area[which(cc$wetland_appear_frequency %in% "FACW")])/veg.area*100
 
-        dominant_data$OBL_FACW_ratio[i] <- length(which(cc$wetland_appear_frequency %in% c("OBL","FACW")))/(dim(aa)[1]-7)
-        dominant_data$OBL_FACW_area_ratio[i] <- sum(cc$area[which(cc$wetland_appear_frequency %in% c("OBL","FACW"))])/aa$area[1]*100
+        dominant_data$OBL_FACW_ratio[i] <- length(which(cc$wetland_appear_frequency %in% c("OBL","FACW")))/(dim(aa)[1]-7)*100
+        dominant_data$OBL_FACW_area_ratio[i] <- sum(cc$area[which(cc$wetland_appear_frequency %in% c("OBL","FACW"))])/veg.area*100
 
-        dominant_data$subtree_tree_ratio[i] <- length(which(cc$growth_type %in% c("Subtree","Tree")))/(dim(aa)[1]-7)
-        dominant_data$subtree_tree_area_ratio[i] <- sum(cc$area[which(cc$growth_type %in% c("Subtree","Tree"))])/aa$area[1]*100
+        dominant_data$subtree_tree_ratio[i] <- length(which(cc$growth_type %in% c("Subtree","Tree")))/(dim(aa)[1]-7)*100
+        dominant_data$subtree_tree_area_ratio[i] <- sum(cc$area[which(cc$growth_type %in% c("Subtree","Tree"))])/veg.area*100
 
-        dominant_data$naturalized_ratio[i] <- length(which(cc$naturalized == "O"))/(dim(aa)[1]-7)
-        dominant_data$naturalized_area_ratio[i] <- sum(cc$area[which(cc$naturalized == "O")])/aa$area[1]*100
+        dominant_data$naturalized_ratio[i] <- length(which(cc$naturalized == "O"))/(dim(aa)[1]-7)*100
+        dominant_data$naturalized_area_ratio[i] <- sum(cc$area[which(cc$naturalized == "O")])/veg.area*100
 
-        dominant_data$ecosystem_disturb_ratio[i] <- length(which(cc$ecosystem_disturb == "O"))/(dim(aa)[1]-7)
-        dominant_data$ecosystem_disturb_area_ratio[i] <- sum(cc$area[which(cc$ecosystem_disturb == "O")])/aa$area[1]*100
+        dominant_data$ecosystem_disturb_ratio[i] <- length(which(cc$ecosystem_disturb == "O"))/(dim(aa)[1]-7)*100
+        dominant_data$ecosystem_disturb_area_ratio[i] <- sum(cc$area[which(cc$ecosystem_disturb == "O")])/veg.area*100
 
-        dominant_data$Salix_Fraxinus_Alnus_Ulmus_ratio[i] <- length(which(cc$Salix_Fraxinus_Alnus_Ulmus == "O"))/(dim(aa)[1]-7)
-        dominant_data$Salix_Fraxinus_Alnus_Ulmus_area_ratio[i] <- sum(cc$area[which(cc$Salix_Fraxinus_Alnus_Ulmus == "O")])/aa$area[1]*100
+        dominant_data$Salix_Fraxinus_Alnus_Ulmus_ratio[i] <- length(which(cc$Salix_Fraxinus_Alnus_Ulmus == "O"))/(dim(aa)[1]-7)*100
+        dominant_data$Salix_Fraxinus_Alnus_Ulmus_area_ratio[i] <- sum(cc$area[which(cc$Salix_Fraxinus_Alnus_Ulmus == "O")])/veg.area*100
 
-
+        dominant_data[i,-1] <- round(dominant_data[i,-1],1)
     }
 
     except.plant <- data.frame(colnames(area.matrix),t(area.matrix[2:7,]))
@@ -196,7 +202,7 @@ RVI_all <- function(){
             aa <- area.matrix[-which(is.na(area.matrix[,i])),][i]
             whole.area.num[i,1] <- names(aa)
             whole.area.num[i,2] <- c(dim(aa)[1]-7)
-            whole.area.num[i,3] <- aa[1,1]
+            whole.area.num[i,3] <- sum(aa[,1][8:dim(aa)[1]])
         }
     }
     names(whole.area.num) <- c("site_code","total_communties","total_area")
@@ -252,7 +258,6 @@ RVI_all <- function(){
         colnames(aa) <- c("species_code","present")
         bb <- species.list[which(species.list$species_code %in% rownames(aa)),]
         cc <- merge(bb, aa, by = "species_code")
-        cc
 
         richness.data$site_code[i] <- colnames(plant.spri)[i]
 
@@ -277,12 +282,12 @@ RVI_all <- function(){
         richness.data$introduced_species[i] <- length(which(cc$introduced == "O"))
 
         richness.data$total_species[i] <- dim(aa)[1]
+        richness.data[i,-1] <- round(richness.data[i,-1],1)
 
     }
     richness.data
 
 
-    env.data.tf.lalo[,c(1:11,19:22,27:29)]
     rownames(plant.spri)[7:dim(plant.spri)[1]] <- species.list$species_name[7:length(species.list$species_name)]
     plant.spri.t <- data.frame(names(plant.spri),t(plant.spri[-c(1:6),]))
     names(plant.spri.t)[1] <- "site_code"
