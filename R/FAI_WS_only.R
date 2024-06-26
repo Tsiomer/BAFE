@@ -23,6 +23,7 @@ FAI_WS_only <- function(filepath = NA){
     }
     extract.abun_raw <- raw.abun[,c(4,5,8,9,14,15)]
     extract.abun <- extract.abun_raw[extract.abun_raw$waterside_middle == "waterside",][,-2]
+    extract.abun <- extract.abun[-which(is.na(extract.abun$site_code)),]
     species.data <- data.frame(readxl::read_excel(filepath.1, sheet = 6, skip = 2))
 
     if( sum(names(species.data) == c("species_name", "G_tolerance", "G_feeding", "G_habitat", "exotic",
@@ -43,7 +44,8 @@ FAI_WS_only <- function(filepath = NA){
         stop("need to check environmental data")
     }
     stream_order <- env.raw[,c(11,9)]
-    site.list <- unique(extract.abun[,1])
+    extract.abun$site_code |>
+        unique() -> site.list.a # site list for FAI calculation
 
 
     colnames(stream_order) <- c(colnames(extract.abun)[1], "stream_order")
