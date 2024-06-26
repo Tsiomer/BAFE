@@ -22,7 +22,11 @@ FAI_WS <- function(filepath = NA){
         stop("need to check fish data")
     }
     extract.abun_raw <- raw.abun[,c(4,5,8,9,14,15)]
+
     extract.abun <- extract.abun_raw[extract.abun_raw$waterside_middle == "waterside",][,-2]
+
+    extract.abun <- extract.abun[-which(is.na(extract.abun$site_code)),]
+
     species.data <- data.frame(readxl::read_excel(filepath.1, sheet = 6, skip = 2))
 
     if( sum(names(species.data) == c("species_name", "G_tolerance", "G_feeding", "G_habitat", "exotic",
@@ -43,7 +47,9 @@ FAI_WS <- function(filepath = NA){
         stop("need to check environmental data")
     }
     stream_order <- env.raw[,c(11,9)]
-    site.list <- unique(extract.abun[,1])
+
+    extract.abun$site_code |>
+        unique() -> site.list.a # site list for FAI calculation
 
 
     colnames(stream_order) <- c(colnames(extract.abun)[1], "stream_order")
@@ -56,43 +62,43 @@ FAI_WS <- function(filepath = NA){
 
 
 
-    M1.aggregation <- data.frame(matrix(nrow = length(site.list), ncol = 2))
-    M1.aggregation[,1] <- site.list
+    M1.aggregation <- data.frame(matrix(nrow = length(site.list.a), ncol = 2))
+    M1.aggregation[,1] <- site.list.a
     colnames(M1.aggregation) <- c("site_code", "M1")
-    M2.aggregation <- data.frame(matrix(nrow = length(site.list), ncol = 2))
-    M2.aggregation[,1] <- site.list
+    M2.aggregation <- data.frame(matrix(nrow = length(site.list.a), ncol = 2))
+    M2.aggregation[,1] <- site.list.a
     colnames(M2.aggregation) <- c("site_code", "M2")
-    M3.aggregation <- data.frame(matrix(nrow = length(site.list), ncol = 2))
-    M3.aggregation[,1] <- site.list
+    M3.aggregation <- data.frame(matrix(nrow = length(site.list.a), ncol = 2))
+    M3.aggregation[,1] <- site.list.a
     colnames(M3.aggregation) <- c("site_code", "M3")
-    M4.aggregation <- data.frame(matrix(nrow = length(site.list), ncol = 2))
-    M4.aggregation[,1] <- site.list
+    M4.aggregation <- data.frame(matrix(nrow = length(site.list.a), ncol = 2))
+    M4.aggregation[,1] <- site.list.a
     colnames(M4.aggregation) <- c("site_code", "M4")
-    M5.aggregation <- data.frame(matrix(nrow = length(site.list), ncol = 2))
-    M5.aggregation[,1] <- site.list
+    M5.aggregation <- data.frame(matrix(nrow = length(site.list.a), ncol = 2))
+    M5.aggregation[,1] <- site.list.a
     colnames(M5.aggregation) <- c("site_code", "M5")
-    M6.aggregation <- data.frame(matrix(nrow = length(site.list), ncol = 2))
-    M6.aggregation[,1] <- site.list
+    M6.aggregation <- data.frame(matrix(nrow = length(site.list.a), ncol = 2))
+    M6.aggregation[,1] <- site.list.a
     colnames(M6.aggregation) <- c("site_code", "M6")
-    M7.aggregation <- data.frame(matrix(nrow = length(site.list), ncol = 2))
-    M7.aggregation[,1] <- site.list
+    M7.aggregation <- data.frame(matrix(nrow = length(site.list.a), ncol = 2))
+    M7.aggregation[,1] <- site.list.a
     colnames(M7.aggregation) <- c("site_code", "M7")
-    M8.aggregation <- data.frame(matrix(nrow = length(site.list), ncol = 2))
-    M8.aggregation[,1] <- site.list
+    M8.aggregation <- data.frame(matrix(nrow = length(site.list.a), ncol = 2))
+    M8.aggregation[,1] <- site.list.a
     colnames(M8.aggregation) <- c("site_code", "M8")
 
-    for(i in 1:length(site.list)){
-        subset.0 <- subset(extract.abun.so.2, site_code == site.list[i])
-        if("F00000" %in% subset.0$Species_Code){
+    for(i in 1:length(site.list.a)){
+        subset.0 <- subset(extract.abun.so.2, site_code == site.list.a[i])
+        if("U00001" %in% subset.0$Species_Code | "U00002" %in% subset.0$Species_Code ){
             M1<-0;M2<-0;M3<-0;M4<-0;M5<-0;M6<-0;M7<-0;M8<-0
-            M1.aggregation[M1.aggregation[,1] ==  site.list[i],][2] <- M1
-            M2.aggregation[M2.aggregation[,1] ==  site.list[i],][2] <- M2
-            M3.aggregation[M3.aggregation[,1] ==  site.list[i],][2] <- M3
-            M4.aggregation[M4.aggregation[,1] ==  site.list[i],][2] <- M4
-            M5.aggregation[M5.aggregation[,1] ==  site.list[i],][2] <- M5
-            M6.aggregation[M6.aggregation[,1] ==  site.list[i],][2] <- M6
-            M7.aggregation[M7.aggregation[,1] ==  site.list[i],][2] <- M7
-            M8.aggregation[M8.aggregation[,1] ==  site.list[i],][2] <- M8
+            M1.aggregation[M1.aggregation[,1] ==  site.list.a[i],][2] <- M1
+            M2.aggregation[M2.aggregation[,1] ==  site.list.a[i],][2] <- M2
+            M3.aggregation[M3.aggregation[,1] ==  site.list.a[i],][2] <- M3
+            M4.aggregation[M4.aggregation[,1] ==  site.list.a[i],][2] <- M4
+            M5.aggregation[M5.aggregation[,1] ==  site.list.a[i],][2] <- M5
+            M6.aggregation[M6.aggregation[,1] ==  site.list.a[i],][2] <- M6
+            M7.aggregation[M7.aggregation[,1] ==  site.list.a[i],][2] <- M7
+            M8.aggregation[M8.aggregation[,1] ==  site.list.a[i],][2] <- M8
 
         }else{
             st.order <- unique(subset.0$stream_order)
@@ -184,14 +190,14 @@ FAI_WS <- function(filepath = NA){
                 M8 <- 0
             }
 
-            M1.aggregation[M1.aggregation[,1] ==  site.list[i],][2] <- M1
-            M2.aggregation[M2.aggregation[,1] ==  site.list[i],][2] <- M2
-            M3.aggregation[M3.aggregation[,1] ==  site.list[i],][2] <- M3
-            M4.aggregation[M4.aggregation[,1] ==  site.list[i],][2] <- M4
-            M5.aggregation[M5.aggregation[,1] ==  site.list[i],][2] <- M5
-            M6.aggregation[M6.aggregation[,1] ==  site.list[i],][2] <- M6
-            M7.aggregation[M7.aggregation[,1] ==  site.list[i],][2] <- M7
-            M8.aggregation[M8.aggregation[,1] ==  site.list[i],][2] <- M8
+            M1.aggregation[M1.aggregation[,1] ==  site.list.a[i],][2] <- M1
+            M2.aggregation[M2.aggregation[,1] ==  site.list.a[i],][2] <- M2
+            M3.aggregation[M3.aggregation[,1] ==  site.list.a[i],][2] <- M3
+            M4.aggregation[M4.aggregation[,1] ==  site.list.a[i],][2] <- M4
+            M5.aggregation[M5.aggregation[,1] ==  site.list.a[i],][2] <- M5
+            M6.aggregation[M6.aggregation[,1] ==  site.list.a[i],][2] <- M6
+            M7.aggregation[M7.aggregation[,1] ==  site.list.a[i],][2] <- M7
+            M8.aggregation[M8.aggregation[,1] ==  site.list.a[i],][2] <- M8
         }
 
     }
@@ -241,6 +247,10 @@ FAI_WS <- function(filepath = NA){
     env.raw.la_lo.2.1[,c(37:39)][is.na(env.raw.la_lo.2.1[,c(37:39)])] <- "-"
     colnames(env.raw.la_lo.2.1)[11] <- "site_code"
 
+    length(env.raw.la_lo.2.1$site_code)
+
+    length(total_data$site_code)
+
     total_data <- merge(env.raw.la_lo.2.1, merged_matric.2[,-12], by = "site_code")
 
     total_data.t <- t(total_data)
@@ -275,5 +285,6 @@ FAI_WS <- function(filepath = NA){
 
     DB.form <- rbind(total_data.t.3,allspecies.matrix.2)
     write.csv(DB.form, "DB.form.fish_waterside.csv", fileEncoding = "EUC-KR")
+
 }
 
