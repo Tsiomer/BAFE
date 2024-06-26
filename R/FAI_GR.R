@@ -17,34 +17,36 @@ FAI_GR <- function(filepath = NA){
     raw.abun
 
     if(sum(names(raw.abun) == c("year", "site", "large", "site_code", "waterside_middle", "survey_order",
-                                 "number", "species_name", "inds", "abnormal_DE", "abnormal_EF", "abnormal_LE",
-                                 "abnormalTU_", "abnormal_sum", "species_code")) != 15 ){
+                                "number", "species_name", "inds", "abnormal_DE", "abnormal_EF", "abnormal_LE",
+                                "abnormalTU_", "abnormal_sum", "species_code")) != 15 ){
         stop("need to check fish data")
     }
     extract.abun_raw <- raw.abun[,c(4,5,8,9,14,15)]
     extract.abun <- extract.abun_raw[extract.abun_raw$waterside_middle == "center",][,-2]
+    extract.abun <- extract.abun[-which(is.na(extract.abun$site_code)),]
     species.data <- data.frame(readxl::read_excel(filepath.1, sheet = 6, skip = 2))
 
     if(sum(names(species.data) == c("species_name", "G_tolerance", "G_feeding", "G_habitat", "exotic",
-                                     "endemic", "endangered_1", "endangered_2", "natural_monument",
-                                     "order_by_line", "class", "order", "family", "scientific_name", "Species_Code")) != 15 ){
+                                    "endemic", "endangered_1", "endangered_2", "natural_monument",
+                                    "order_by_line", "class", "order", "family", "scientific_name", "Species_Code")) != 15 ){
         stop("need to check species list")
     }
     env.raw <- data.frame(readxl::read_excel(filepath.1, sheet = 2, skip = 1))
 
     if(sum(names(env.raw) == c("No.", "site", "watershed", "water_system", "subbasin", "stream",
-                                "main_tributary_etc", "survey_order", "stream_order", "large", "site_code",
-                                "organization", "investigator", "session", "investigate_tools", "investigate_time",
-                                "date", "weather", "center_tool", "center_time", "center_date", "center_weather",
-                                "lat_degree", "lat_minute", "lat_second", "long_degree", "long_minute", "long_second",
-                                "flow_status", "bedrock", "concrete", "silt", "finesand", "fine_gravel", "gravel",
-                                "pebble", "cobble", "substrate_sum", "stream_type", "velocity", "invetigate_no",
-                                "IN_special_note", "investigate_special_note", "unconfirmed_species")) != 44 ){
+                               "main_tributary_etc", "survey_order", "stream_order", "large", "site_code",
+                               "organization", "investigator", "session", "investigate_tools", "investigate_time",
+                               "date", "weather", "center_tool", "center_time", "center_date", "center_weather",
+                               "lat_degree", "lat_minute", "lat_second", "long_degree", "long_minute", "long_second",
+                               "flow_status", "bedrock", "concrete", "silt", "finesand", "fine_gravel", "gravel",
+                               "pebble", "cobble", "substrate_sum", "stream_type", "velocity", "invetigate_no",
+                               "IN_special_note", "investigate_special_note", "unconfirmed_species")) != 44 ){
         stop("need to check environmental data")
     }
     stream_order <- env.raw[,c(11,9)]
+    extract.abun$site_code |>
+        unique() -> site.list # site list for FAI calculation
 
-    site.list <- unique(extract.abun[,1])
     colnames(stream_order) <- c(colnames(extract.abun)[1], "stream_order")
 
 
