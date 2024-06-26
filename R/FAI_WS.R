@@ -247,10 +247,6 @@ FAI_WS <- function(filepath = NA){
     env.raw.la_lo.2.1[,c(37:39)][is.na(env.raw.la_lo.2.1[,c(37:39)])] <- "-"
     colnames(env.raw.la_lo.2.1)[11] <- "site_code"
 
-    length(env.raw.la_lo.2.1$site_code)
-
-    length(total_data$site_code)
-
     total_data <- merge(env.raw.la_lo.2.1, merged_matric.2[,-12], by = "site_code")
 
     total_data.t <- t(total_data)
