@@ -84,7 +84,7 @@ FAI_GR <- function(filepath = NA){
 
     for(i in 1:length(site.list)){
         subset.0 <- subset(extract.abun.so.2, site_code == site.list[i])
-        if("F00000" %in% subset.0$Species_Code){
+        if("U00001" %in% subset.0$Species_Code | "U00002" %in% subset.0$Species_Code){
             M1<-0;M2<-0;M3<-0;M4<-0;M5<-0;M6<-0;M7<-0;M8<-0
             M1.aggregation[M1.aggregation[,1] ==  site.list[i],][2] <- M1
             M2.aggregation[M2.aggregation[,1] ==  site.list[i],][2] <- M2
@@ -247,8 +247,10 @@ FAI_GR <- function(filepath = NA){
 
 
     }
-    allspecies.matrix.2 <- allspecies.matrix[-which(rownames(allspecies.matrix)=="F00000"),]
-    rownames(allspecies.matrix.2) <- species.data$species_name[-which(rownames(allspecies.matrix)=="F00000")]
+    allspecies.matrix.2 <- allspecies.matrix[-c(which(rownames(allspecies.matrix)=="U00001"),
+                                                which(rownames(allspecies.matrix)=="U00002")),]
+    rownames(allspecies.matrix.2) <- species.data$species_name[-c(which(rownames(allspecies.matrix)=="U00001"),
+                                                                  which(rownames(allspecies.matrix)=="U00002"))]
 
     DB.form <- rbind(total_data.t.3,allspecies.matrix.2)
     write.csv(DB.form, "DB.form.fish_greatriver.csv", fileEncoding = "EUC-KR")
