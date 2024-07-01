@@ -276,8 +276,10 @@ FAI_WS <- function(filepath = NA){
 
 
     }
-    allspecies.matrix.2 <- allspecies.matrix[-which(rownames(allspecies.matrix)=="F00000"),]
-    rownames(allspecies.matrix.2) <- species.data$species_name[-which(rownames(allspecies.matrix)=="F00000")]
+    allspecies.matrix.2 <- allspecies.matrix[-c(which(rownames(allspecies.matrix)=="U00001"),
+                                                which(rownames(allspecies.matrix)=="U00002")),]
+    rownames(allspecies.matrix.2) <- species.data$species_name[-c(which(rownames(allspecies.matrix)=="U00001"),
+                                                                  which(rownames(allspecies.matrix)=="U00002"))]
 
     DB.form <- rbind(total_data.t.3,allspecies.matrix.2)
     write.csv(DB.form, "DB.form.fish_waterside.csv", fileEncoding = "EUC-KR")
