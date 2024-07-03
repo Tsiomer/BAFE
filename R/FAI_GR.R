@@ -201,10 +201,33 @@ FAI_GR <- function(filepath = NA){
             merged_matric.2$rank[i] <- c("E","D","C","B","A")[cut(as.numeric(merged_matric.2$FAI_special_issue[i]), breaks = c(0,20,40,60,80,101),right = F)]
         }
     }
+    #species number and abundance
+    extract.abun.so.2
+    #species number = count of each site code
+    site.list
 
+    species.n.a <- data.frame(matrix(nrow = length(site.list), ncol = 3)) #species number and abundance
+    species.n.a[,1] <- site.list
+    for(i in 1:length(site.list)){
+        aa <-which(extract.abun.so.2$site_code == site.list[i])
+        if(T %in% c(extract.abun.so.2$Species_Code[aa] %in% c("U00001","U00002"))){
+            s.n <- NA
+            s.a <- NA
+            species.n.a[i,2] <- s.n
+            species.n.a[i,3] <- s.a
+        }else{
+            c(extract.abun.so.2$site_code == site.list[i]) |>
+                which() -> bb #index of site[i] in extract.abun.so.2
+            s.n <- length(bb)
+            s.a <- sum(extract.abun.so.2$inds[bb])
+            species.n.a[i,2] <- s.n
+            species.n.a[i,3] <- s.a
+        }
+    }
+    colnames(species.n.a) <- c("site_code","richness","abundance")
 
     latitude <- paste(env.raw$lat_degree,env.raw$lat_minute,env.raw$lat_second)
-    longitude <- paste0(env.raw$long_degree,env.raw$long_minute,env.raw$long_second)
+    longitude <- paste(env.raw$long_degree,env.raw$long_minute,env.raw$long_second)
 
     env.raw.la_lo <- env.raw
 
@@ -218,13 +241,15 @@ FAI_GR <- function(filepath = NA){
     env.raw.la_lo.2.1[,c(37:39)][is.na(env.raw.la_lo.2.1[,c(37:39)])] <- "-"
     colnames(env.raw.la_lo.2.1)[11] <- "site_code"
 
-    total_data <- merge(env.raw.la_lo.2.1, merged_matric.2[,-12], by = "site_code")
+    total_data <- env.raw.la_lo.2.1 |>
+        merge(species.n.a, by = "site_code") |>
+        merge(merged_matric.2[,-12], by = "site_code")
 
     total_data.t <- t(total_data)
 
     colnames(total_data.t) <- total_data.t[which(rownames(total_data.t)=="site_code"),]
     total_data.t <- total_data.t[-which(rownames(total_data.t)=="site_code"),]
-    total_data.t.2 <- total_data.t[-c(18:21,10,1),]
+    total_data.t.2 <- total_data.t[-c(14:17,10,1),]
 
     total_data.t.3 <- rbind(total_data.t.2[1:7,],
                             total_data.t.2[16:17,],
@@ -232,7 +257,7 @@ FAI_GR <- function(filepath = NA){
                             total_data.t.2[9:10,],
                             total_data.t.2[c(8,13,12),],
                             total_data.t.2[18:32,],
-                            total_data.t.2[34:44,])
+                            total_data.t.2[34:46,])
 
     allspecies.matrix <- data.frame(matrix(nrow = dim(species.data)[1], ncol = dim(total_data.t.3)[2]))
     rownames(allspecies.matrix) <- species.data$Species_Code
