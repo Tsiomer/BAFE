@@ -271,7 +271,7 @@ RVI_data.transform <- function(){
     for(i in 1:dim(cross_section)[1]){
         if(i==1){
             if(cross_section$depth[i] == 0){
-                if(cross_section$wetland_appear_frequency[i] == "UPL"){
+                if(cross_section$wetland_appear_frequency[i] == "UPL" | cross_section$wetland_appear_frequency[i] == "OBU"){
                     temp <- 1
                 }else if(cross_section$wetland_appear_frequency[i] == "FACU"){
                     temp <- 2
@@ -279,7 +279,7 @@ RVI_data.transform <- function(){
                     temp <- 3
                 }else if(cross_section$wetland_appear_frequency[i] == "FACW"){
                     temp <- 4
-                }else if(cross_section$wetland_appear_frequency[i] == "OBL"){
+                }else if(cross_section$wetland_appear_frequency[i] == "OBL" | cross_section$wetland_appear_frequency[i] == "OBW" ){
                     temp <- 5
                 }else if(cross_section$wetland_appear_frequency[i] == "NA"){
                     temp <- NA
@@ -289,7 +289,7 @@ RVI_data.transform <- function(){
             }
         }else{
             if(cross_section$depth[i] == 0){
-                if(cross_section$wetland_appear_frequency[i] == "UPL"){
+                if(cross_section$wetland_appear_frequency[i] == "UPL" | cross_section$wetland_appear_frequency[i] == "OBU"){
                     temp <- c(temp ,1)
                 }else if(cross_section$wetland_appear_frequency[i] == "FACU"){
                     temp <- c(temp ,2)
@@ -297,7 +297,7 @@ RVI_data.transform <- function(){
                     temp <- c(temp ,3)
                 }else if(cross_section$wetland_appear_frequency[i] == "FACW"){
                     temp <- c(temp ,4)
-                }else if(cross_section$wetland_appear_frequency[i] == "OBL"){
+                }else if(cross_section$wetland_appear_frequency[i] == "OBL" | cross_section$wetland_appear_frequency[i] == "OBW"){
                     temp <- c(temp ,5)
                 }else if(cross_section$wetland_appear_frequency[i] == "NA"){
                     temp <- c(temp ,NA)
