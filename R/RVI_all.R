@@ -27,7 +27,13 @@ RVI_all <- function(){
             RVI.matrix$site_code[i] <- names(area.matrix)[i]
             next
         }else{
-            aa <- area.matrix[-which(is.na(area.matrix[,i])),][i]
+            if(dim(area.matrix)[2] == 1){
+                area.matrix |>
+                    as.matrix() -> aa.0
+                aa.0[-which(is.na(area.matrix[,i])),] |> as.data.frame() -> aa
+            }else(
+                aa <- area.matrix[-which(is.na(area.matrix[,i])),][i]
+            )
             aa <- cbind(rownames(aa), aa)
             colnames(aa) <- c("species_code","area")
             veg.area <- sum(aa$area[8:length(aa$area)])
@@ -143,7 +149,13 @@ RVI_all <- function(){
 
 
     for(i in 1:dim(area.matrix)[2]){
-        aa <- area.matrix[-which(is.na(area.matrix[,i])),][i]
+        if(dim(area.matrix)[2] == 1){
+            area.matrix |>
+                as.matrix() -> aa.0
+            aa.0[-which(is.na(area.matrix[,i])),] |> as.data.frame() -> aa
+        }else(
+            aa <- area.matrix[-which(is.na(area.matrix[,i])),][i]
+        )
         aa <- cbind(rownames(aa), aa)
         colnames(aa) <- c("species_code","area")
         veg.area <- sum(aa$area[8:length(aa$area)])
@@ -199,7 +211,15 @@ RVI_all <- function(){
             whole.area.num[i,2] <- NA
             whole.area.num[i,3] <- NA
         }else{
-            aa <- area.matrix[-which(is.na(area.matrix[,i])),][i]
+            if(dim(area.matrix)[2] == 1){
+                area.matrix |>
+                    as.matrix() -> aa.0
+                aa.0[-which(is.na(area.matrix[,i])),] |> as.data.frame() -> aa
+                colnames(aa) <- colnames(aa.0)
+            }else(
+                aa <- area.matrix[-which(is.na(area.matrix[,i])),][i]
+            )
+            aa
             whole.area.num[i,1] <- names(aa)
             whole.area.num[i,2] <- c(dim(aa)[1]-7)
             whole.area.num[i,3] <- sum(aa[,1][8:dim(aa)[1]])
@@ -253,7 +273,13 @@ RVI_all <- function(){
 
 
     for(i in 1:dim(plant.spri)[2]){
-        aa <- plant.spri[-which(is.na(plant.spri[,i])),][i]
+        if(dim(area.matrix)[2] == 1){
+            plant.spri |>
+                as.matrix() -> aa.0
+            aa.0[-which(is.na(plant.spri[,i])),] |> as.data.frame() -> aa
+        }else(
+            aa <- plant.spri[-which(is.na(plant.spri[,i])),][i]
+        )
         aa <- cbind(rownames(aa), aa)
         colnames(aa) <- c("species_code","present")
         bb <- species.list[which(species.list$species_code %in% rownames(aa)),]
@@ -407,5 +433,4 @@ RVI_all <- function(){
 
     DB.form.vegetation3 <- data.frame(rbind(env.data.dom, cross_section.DF.2, observed.plant.DF.CN, survey_site.dominance_rank))
     write.csv(DB.form.vegetation3, file = "DB.form.crosssection.csv", fileEncoding = "EUC-KR",row.names = F)
-
 }
