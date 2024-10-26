@@ -160,7 +160,26 @@ RVI_data.transform <- function(){
                     }else{
                         packets[[i]] <- temp.site[c((zero.index[i]+1):dim(temp.site)[1]),]
                     }
-                }else{
+                }else if(zero.index[1] == length(temp.site$depth) & length(zero.index) == 1){
+                    if(i == 0){
+                        packets[[i+1]] <- temp.site[-zero.index,]
+                    }else{
+                        break
+                    }
+                }else if(zero.index[length(zero.index)] == length(temp.site$depth) & length(zero.index) > 1){
+                    if(i == 0){
+                        packets[[i+1]] <- temp.site[1:(zero.index[1]-1),]
+                    }else if(i > 0 & i < length(zero.index)){
+                        if(i == 1){
+                            next
+                        }else{
+                            packets[[i]] <- temp.site[c((zero.index[i-1]+1):(zero.index[i]-1)),]
+                        }
+                    }else{
+                        packets[[i]] <- temp.site[c((zero.index[i-1]+1):(zero.index[i]-1)),]
+                    }
+                }
+                else{
                     if(i == 0){
                         packets[[i+1]] <- temp.site[1:(zero.index[1]-1),]
                     }else if(i > 0 & i < length(zero.index)){
@@ -171,12 +190,18 @@ RVI_data.transform <- function(){
                 }
 
             }
+
+            packets
             if(length(zero.index) == 1){
                 height1 <- rev(cumsum(rev(data.frame(packets[[1]])[,19])))
                 height.end <- cumsum(data.frame(packets[[length(packets)]])[,19])
                 if(zero.index == 1){
                     relative.height <- c(0, height.end)
-                }else{
+                }
+                else if(zero.index == length(temp.site$depth)){
+                    relative.height <- c(height1, 0)
+                }
+                else{
                     relative.height <- c(height1,0,height.end)
                 }
 
@@ -204,10 +229,34 @@ RVI_data.transform <- function(){
                         }else{
                             rehe_between <- c(rehe_between,0,total.rehe)
                         }
-
                     }
                     relative.height <- c(0,height1,rehe_between)
-                }else{
+                }else if(length(temp.site$depth)%in% zero.index){
+                    height1 <- rev(cumsum(rev(data.frame(packets[[1]])[,19])))
+                    for(k in 1:(length(zero.index)-1)){
+                        packet.b.0 <- data.frame(packets[[k+1]])[,19]
+                        if(length(packet.b.0)%% 2 == 0){
+                            right_half <- cumsum(packet.b.0[1:(length(packet.b.0)/2)])
+                            left_half <- rev(cumsum(rev(packet.b.0[((length(packet.b.0)/2)+1):length(packet.b.0)])))
+                            total.rehe <- c(right_half, left_half)
+                        }else{
+                            if(length(packet.b.0)==1){
+                                total.rehe <- packet.b.0
+                            }else{
+                                right_half <- cumsum(packet.b.0[1:((length(packet.b.0)+1)/2)])
+                                left_half <- rev(cumsum(rev(packet.b.0[(((length(packet.b.0)+1)/2)+1):length(packet.b.0)])))
+                                total.rehe <- c(right_half, left_half)
+                            }
+                        }
+                        if(k==1){
+                            rehe_between <- c(0,total.rehe)
+                        }else{
+                            rehe_between <- c(rehe_between,0,total.rehe)
+                        }
+                    }
+                    relative.height <- c(height1,rehe_between,0)
+                }
+                else{
                     height1 <- rev(cumsum(rev(data.frame(packets[[1]])[,19])))
                     height.end <- cumsum(data.frame(packets[[length(packets)]])[,19])
 
@@ -240,9 +289,7 @@ RVI_data.transform <- function(){
             }
             relative.height
             cross_section$relative_height[min(which(cross_section$site_code %in% site.list[j])):max(which(cross_section$site_code %in% site.list[j]))] <- relative.height
-
         }
-
     }
     cross_section
     for(i in 1:length(cross_section$species_code)){
