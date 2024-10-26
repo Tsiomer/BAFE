@@ -98,7 +98,10 @@ RVI_data.transform <- function(){
 
             site.temp <- plant.area[plant.area$site_code %in% colnames(area.matrix)[i],]
             site.bio <- site.temp[-which(site.temp$label %in% c("w","a","d","m","h","ag1")),]
-            site.bio2 <- aggregate(site.bio$area, by = list(site.bio$species_code), FUN = sum)
+            site.bio1 <- site.bio |>
+                dplyr::group_by(species_code) |>
+                dplyr::summarise(area = sum(area, na.rm = TRUE))
+            site.bio2 <- as.data.frame(site.bio1)
             for(j in 1:dim(site.bio2)[1]){
                 area.matrix[which(rownames(area.matrix) == site.bio2[j,1]),i] <-  site.bio2[j,2]
             }
