@@ -63,7 +63,12 @@ RVI_all <- function(){
         }
 
     }
-    RVI.matrix
+    RVI.matrix$HAA[is.na(RVI.matrix$HAA)] <- 0
+    RVI.matrix$EA[is.na(RVI.matrix$EA)] <- 100
+    RVI.matrix$WTD[is.na(RVI.matrix$WTD)] <- 0
+    RVI.matrix$SalFraA[is.na(RVI.matrix$SalFraA)] <- 0
+    RVI.matrix$ToSC[is.na(RVI.matrix$ToSC)] <- 100
+    RVI.matrix$BTI[is.na(RVI.matrix$BTI)] <- 0
 
     HAA.score <- c(0,5,3,1,0)[cut(RVI.matrix$HAA, breaks = c(-1,5,15,36,80,99999))]
     EA.score <- c(5,3,1,0)[cut(RVI.matrix$EA, breaks = c(-1,4,16,50,99999))]
