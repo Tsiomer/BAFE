@@ -14,8 +14,9 @@ RVI_only <- function(){
     species.list <- x$species.list
     env.data <- x$env.data
     species.richness.sort <- x$species.richness.sort
-    site.list <- x$site.list
 
+    site.list <- x$site.list
+    species.appear <- x$species.appear
 
     RVI.matrix <- data.frame(matrix(nrow = dim(area.matrix)[2], ncol = 7))
 
@@ -26,33 +27,48 @@ RVI_only <- function(){
             RVI.matrix$site_code[i] <- names(area.matrix)[i]
             next
         }else{
-            aa <- area.matrix[-which(is.na(area.matrix[,i])),][i]
+            if(dim(area.matrix)[2] == 1){
+                area.matrix |>
+                    as.matrix() -> aa.0
+                aa.0[-which(is.na(area.matrix[,i])),] |> as.data.frame() -> aa
+            }else(
+                aa <- area.matrix[-which(is.na(area.matrix[,i])),][i]
+            )
             aa <- cbind(rownames(aa), aa)
             colnames(aa) <- c("species_code","area")
+            veg.area <- sum(aa$area[8:length(aa$area)])
+
             bb <- species.list[which(species.list$species_code %in% rownames(aa)),]
             cc <- merge(bb, aa, by = "species_code")
 
             RVI.matrix$site_code[i] <- names(area.matrix)[i]
 
-            RVI.matrix$HAA[i] <- sum(cc$area[cc$growth_type %in% c("HerbAn","ClimbAn")])/aa$area[1]*100
+            RVI.matrix$HAA[i] <- sum(cc$area[cc$growth_type %in% c("HerbAn","ClimbAn")])/veg.area*100
 
-            RVI.matrix$EA[i] <- sum(cc$area[which(cc$introduced == "O")])/aa$area[1]*100
+            RVI.matrix$EA[i] <- sum(cc$area[which(cc$introduced == "O")])/veg.area*100
 
-            RVI.matrix$WTD[i] <- sum((aa[-c(1:7),2]/aa[1,2])^2)
+            RVI.matrix$WTD[i] <- sum((aa[-c(1:7),2]/veg.area)^2)
 
-            RVI.matrix$SalFraA[i] <- sum(cc$area[which(cc$Salix_Fraxinus == "O")])/aa$area[1]*100
+            RVI.matrix$SalFraA[i] <- sum(cc$area[which(cc$Salix_Fraxinus == "O")])/veg.area*100
 
             species.richness.1 <- species.richness.sort[which(species.richness.sort$site_code == unique(species.richness.sort$site_code)[i]),]
             species.richness.data <- species.list[which(species.list$species_code %in% species.richness.1$species_code),]
-            RVI.matrix$ToSC[i] <- length(which(species.richness.data$introduced == "O"))/dim(species.richness.data)[1]*100
+            RVI.matrix$ToSC[i] <- length(which(species.richness.data$tolerant  == "O"))/dim(species.richness.data)[1]*100
 
             subset.1 <- subset(cross_section, site_code == site.list[i])
             totallength <- max(subset.1$site_distance)
             RVI.matrix$BTI[i] <- sum(subset.1$each_site_length*subset.1$wetland_appear_frequency_score*subset.1$land_use_type_score, na.rm = T)/totallength
+
+            RVI.matrix[i,-1] <- round(RVI.matrix[i,-1],1)
         }
 
     }
-    RVI.matrix
+    RVI.matrix$HAA[is.na(RVI.matrix$HAA)] <- 0
+    RVI.matrix$EA[is.na(RVI.matrix$EA)] <- 100
+    RVI.matrix$WTD[is.na(RVI.matrix$WTD)] <- 0
+    RVI.matrix$SalFraA[is.na(RVI.matrix$SalFraA)] <- 0
+    RVI.matrix$ToSC[is.na(RVI.matrix$ToSC)] <- 100
+    RVI.matrix$BTI[is.na(RVI.matrix$BTI)] <- 0
 
     HAA.score <- c(0,5,3,1,0)[cut(RVI.matrix$HAA, breaks = c(-1,5,15,36,80,99999))]
     EA.score <- c(5,3,1,0)[cut(RVI.matrix$EA, breaks = c(-1,4,16,50,99999))]
@@ -63,7 +79,7 @@ RVI_only <- function(){
 
     score.ingage <- data.frame(RVI.matrix$site_code, HAA.score, EA.score, WTD.score, SalFraA.score, ToSC.score, BTI.score)
     names(score.ingage)[1] <- "site_code"
-    score.ingage$RVI <- rowSums(score.ingage[,c(2:7)])*(10/3)
+    score.ingage$RVI <- round(rowSums(score.ingage[,c(2:7)])*(10/3),1)
 
     score.ingage$RVI.rank <- c("E","D","C","B","A")[cut(score.ingage$RVI, breaks = c(-1,15,30,50,65,100))]
 
@@ -78,7 +94,6 @@ RVI_only <- function(){
     score.ingage$RVI_special_issue[score.ingage$site_code %in% approach.status$site_code[!(approach.status$invetigate_no == "-")]] <- "-"
 
     score.ingage.2 <- score.ingage
-
     for(i in 1:dim(score.ingage)[1]){
         if(score.ingage$RVI_special_issue[i] == "-"){
             score.ingage.2$RVI.rank[i] <- "-"
